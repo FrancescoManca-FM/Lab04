@@ -92,6 +92,10 @@ public class FXMLController {
     	txtNome.setText(trovato.getNome());
     	txtCognome.setText(trovato.getCognome());
     	Corso corso = boxCorsi.getValue();
+    	if(corso == null) {
+    		txtRisultato.setText("Non hai selezionato nessun corso");
+    		return;
+    	}
     	Studente studente = this.model.getStudente(matricola);
     	if(this.model.StudentIscritto(matricola, corso)) {
     		txtRisultato.setText("Lo studente è già iscritto al corso");
@@ -134,6 +138,7 @@ public class FXMLController {
     	txtNome.clear();
     	txtMatricola.clear();
     	txtRisultato.clear();
+    	boxCorsi.getSelectionModel().clearSelection();
 
     }
 
@@ -166,18 +171,32 @@ public class FXMLController {
 
     @FXML
     void doStampaIscritti(ActionEvent event) {
-    	this.doReset(event);
+    	txtRisultato.clear();
+    	txtNome.clear();
+    	txtCognome.clear();
+    	
     	List<Studente> listaStudenti;
     	try {
     		listaStudenti = this.model.getStudentiCorso(boxCorsi.getValue());
+    		
+    		StringBuilder sb = new StringBuilder();
+    		
+    		for(Studente studente : listaStudenti) {
+        		sb.append(String.format("%-10s ", studente.getMatricola()));
+    			sb.append(String.format("%-30s ", studente.getCognome()));
+    			sb.append(String.format("%-30s ", studente.getNome()));
+    			sb.append(String.format("%-10s ", studente.getCds()));
+    			sb.append("\n");
+        	}
+    		
+    		txtRisultato.appendText(sb.toString());
+    		
     	}catch(NullPointerException npe) {
     		txtRisultato.setText("Devi selezionare un corso!");
     		return;
+    		
     	}
-    	for(Studente a : listaStudenti) {
-    		txtRisultato.appendText(String.format("%-20s", a.getMatricola())+String.format("%-50s", a.getNome())
-    		+String.format("%-50s", a.getCognome())+a.getCds()+"\n");
-    	}
+    	
 
     }
 
